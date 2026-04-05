@@ -519,6 +519,48 @@
   color: #2563eb;
 }
 
+.filter-dates {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.65rem 1rem;
+}
+
+.filter-dates label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filter-dates input[type="date"] {
+  padding: 0.4rem 0.5rem;
+  font: inherit;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 10.5rem;
+}
+
+.filter-dates > button {
+  padding: 0.45rem 0.75rem;
+  font: inherit;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #2563eb;
+  background: #fff;
+  color: #2563eb;
+}
+
+.btn-clear-dates {
+  border-color: #cbd5e1 !important;
+  color: #64748b !important;
+  background: #f8fafc !important;
+}
+
+.btn-clear-dates:hover {
+  border-color: #94a3b8 !important;
+  color: #334155 !important;
+}
+
 .records-meta {
   font-size: 0.875rem;
   color: #555;

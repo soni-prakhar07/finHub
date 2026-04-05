@@ -21,6 +21,22 @@ function toDatetimeLocalValue(iso) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+/** `YYYY-MM-DD` from `<input type="date">` → start of local day as ISO8601 */
+function dateInputToIsoStart(dateStr) {
+  if (!dateStr?.trim()) return "";
+  const d = new Date(`${dateStr.trim()}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toISOString();
+}
+
+/** `YYYY-MM-DD` → end of local day as ISO8601 */
+function dateInputToIsoEnd(dateStr) {
+  if (!dateStr?.trim()) return "";
+  const d = new Date(`${dateStr.trim()}T23:59:59.999`);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toISOString();
+}
+
 export default function RecordsPage() {
   const location = useLocation();
   const isHome = location.pathname === "/";
@@ -28,6 +44,10 @@ export default function RecordsPage() {
   const [typeFilter, setTypeFilter] = useState("");
   const [categoryDraft, setCategoryDraft] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [dateFromDraft, setDateFromDraft] = useState("");
+  const [dateToDraft, setDateToDraft] = useState("");
+  const [dateFromFilter, setDateFromFilter] = useState("");
+  const [dateToFilter, setDateToFilter] = useState("");
   const [page, setPage] = useState(1);
 
   const [records, setRecords] = useState([]);
@@ -53,6 +73,8 @@ export default function RecordsPage() {
       const params = { page, limit: 10 };
       if (typeFilter) params.type = typeFilter;
       if (categoryFilter) params.category = categoryFilter;
+      if (dateFromFilter) params.dateFrom = dateFromFilter;
+      if (dateToFilter) params.dateTo = dateToFilter;
       const { data } = await api.get("/api/records", { params });
       setRecords(data.records ?? []);
       setPagination(data.pagination ?? null);
@@ -90,6 +112,35 @@ export default function RecordsPage() {
 
   function applyCategory() {
     setCategoryFilter(categoryDraft.trim());
+    setPage(1);
+  }
+
+  function applyDates() {
+    const fromIso = dateInputToIsoStart(dateFromDraft);
+    const toIso = dateInputToIsoEnd(dateToDraft);
+    if (dateFromDraft.trim() && !fromIso) {
+      setError("Invalid “from” date.");
+      return;
+    }
+    if (dateToDraft.trim() && !toIso) {
+      setError("Invalid “to” date.");
+      return;
+    }
+    if (fromIso && toIso && new Date(fromIso) > new Date(toIso)) {
+      setError("“From” date must be on or before “to” date.");
+      return;
+    }
+    setError("");
+    setDateFromFilter(fromIso);
+    setDateToFilter(toIso);
+    setPage(1);
+  }
+
+  function clearDates() {
+    setDateFromDraft("");
+    setDateToDraft("");
+    setDateFromFilter("");
+    setDateToFilter("");
     setPage(1);
   }
 
@@ -213,6 +264,32 @@ export default function RecordsPage() {
             Apply
           </button>
         </div>
+        <div className="filter-field filter-dates">
+          <label>
+            <span>From date</span>
+            <input
+              type="date"
+              value={dateFromDraft}
+              onChange={(e) => setDateFromDraft(e.target.value)}
+            />
+          </label>
+          <label>
+            <span>To date</span>
+            <input
+              type="date"
+              value={dateToDraft}
+              onChange={(e) => setDateToDraft(e.target.value)}
+            />
+          </label>
+          <button type="button" onClick={applyDates}>
+            Apply dates
+          </button>
+          {(dateFromFilter || dateToFilter) && (
+            <button type="button" className="btn-clear-dates" onClick={clearDates}>
+              Clear dates
+            </button>
+          )}
+        </div>
       </section>
 
       {loading ? <p className="dashboard-status">Loading…</p> : null}
@@ -231,6 +308,19 @@ export default function RecordsPage() {
             {pagination
               ? ` · Page ${pagination.page} of ${totalPages || 1}`
               : null}
+            {dateFromFilter || dateToFilter ? (
+              <>
+                {" · "}
+                Date:{" "}
+                {dateFromFilter
+                  ? new Date(dateFromFilter).toLocaleDateString()
+                  : "…"}
+                {" — "}
+                {dateToFilter
+                  ? new Date(dateToFilter).toLocaleDateString()
+                  : "…"}
+              </>
+            ) : null}
           </p>
 
           {records.length === 0 ? (

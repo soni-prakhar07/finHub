@@ -85,7 +85,7 @@ Short flags: `-n`, `-e`, `-p`. Fails if the email already exists.
 ### 1. Clone and install dependencies
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/soni-prakhar07/finHub.git
 cd Finance-backend
 
 # API dependencies
