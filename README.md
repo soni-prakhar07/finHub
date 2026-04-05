@@ -109,24 +109,8 @@ CREATE DATABASE finance_db;
 
 In the **project root** (next to `server.js`), create a `.env` file.
 
-**Option A — connection string only** (encode special characters in the password, e.g. `@` → `%40`):
-
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/finance_db?schema=public"
-JWT_SECRET="a-long-random-string"
-PORT=5000
-```
-
-**Option B — split variables** (handy when the password contains `@` or other URL-sensitive characters). The runtime pool uses these; keep `DATABASE_URL` for Prisma CLI (`migrate`, `studio`):
-
-```env
-DATABASE_URL="postgresql://USER:PASSWORD@127.0.0.1:5432/finance_db?schema=public&sslmode=disable"
-DATABASE_USER=postgres
-DATABASE_PASSWORD=your_plain_password
-DATABASE_HOST=127.0.0.1
-DATABASE_PORT=5432
-DATABASE_NAME=finance_db
-
 JWT_SECRET="a-long-random-string"
 PORT=5000
 ```
@@ -195,16 +179,6 @@ VITE_API_BASE_URL=http://localhost:5000
 
 Adjust host/port if your API differs.
 
-### 8. Production build (optional)
-
-```bash
-cd client
-npm run build
-npm run preview
-```
-
-Serve `client/dist` with any static host; configure `VITE_API_BASE_URL` at **build time** so the browser calls the correct API origin.
-
 ---
 
 ## Useful commands
@@ -216,7 +190,6 @@ Serve `client/dist` with any static host; configure `VITE_API_BASE_URL` at **bui
 | `npx prisma migrate deploy` | project root | Apply migrations |
 | `npx prisma studio` | project root | Browse / edit DB in a GUI |
 | `npm run dev` | `client/` | Vite dev server |
-| `npm run build` | `client/` | Production client bundle |
 
 ---
 
